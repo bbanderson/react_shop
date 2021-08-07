@@ -137,17 +137,42 @@ const AppStateProvider = ({ children }) => {
     },
   ];
   const [products] = useState(rawPrototypes);
-  const [order, setOrder] = useState([]);
-  const addToOrder = useCallback((id) => {}, []);
-  const removeFromOrder = useCallback((id) => {}, []);
-  const cleanOrder = useCallback(() => {}, []);
+  const [orders, setOrders] = useState([]);
+  const addToOrders = useCallback((id) => {
+    setOrders((orders) => {
+      const found = orders.find((order) => order.id === id);
+      if (!found) {
+        return [...orders, { id, quantity: 1 }];
+      } else {
+        return orders.map((order) => {
+          if (order.id === id) {
+            return {
+              id,
+              quantity: order.quantity + 1,
+            };
+          } else {
+            return order;
+          }
+        });
+      }
+    });
+  }, []);
+  const removeFromOrders = useCallback((id) => {
+    setOrders((orders) => {
+      return orders.filter((order) => order.id !== id);
+    });
+  }, []);
+  const cleanOrder = useCallback(() => {
+    setOrders([]);
+  }, []);
   return (
     <AppStateContext.Provider
       value={{
         products,
-        order,
-        addToOrder,
-        removeFromOrder,
+        orders,
+        addToOrders,
+        removeFromOrders,
+        cleanOrder,
       }}
     >
       {children}
